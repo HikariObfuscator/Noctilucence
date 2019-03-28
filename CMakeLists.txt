@@ -5,6 +5,17 @@ set(LLVM_LINK_COMPONENTS
   Support
   Object
   Linker
+  Passes
+  AggressiveInstCombine
+  Coroutines
+  IPO
+  InstCombine
+  Instrumentation
+  ScalarOpts
+  TransformUtils
+  Vectorize
+  ObjCARCOpts
+  Obfuscation
 )
 add_llvm_tool(Noctilucence
   Noctilucence.cpp

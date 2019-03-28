@@ -19,4 +19,4 @@
 type = Tool
 name = refrain
 parent = Tools
-required_libraries = Analysis BitReader BinaryFormat Support
+required_libraries = Analysis BitReader BinaryFormat Support Passes AggressiveInstCombine Coroutines IPO InstCombine Instrumentation Scalar Utils Vectorize ObjCARC Obfuscation

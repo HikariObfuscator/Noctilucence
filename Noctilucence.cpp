@@ -36,11 +36,11 @@
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/IR/Module.h"
+#include "llvm/LinkAllPasses.h"
 #include <algorithm>
-//#include <archive.h>
-//#include <archive_entry.h>
 #include <assert.h>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <xar/xar.h>
 
@@ -49,39 +49,6 @@ using namespace llvm::sys;
 using namespace llvm::sys::fs;
 using namespace llvm::object;
 using namespace std;
-
-/*#define assertLA(var,ar) if(var!=ARCHIVE_OK){\
-  errs()<<"LA failed with reason:"<<archive_error_string(ar)<<" errno:"<<archive_errno(ar)<<"\n";\
-  abort();\
-}*/
-
-//Shamefully stolen from tools/llvm-objdump/MachODump.cpp
-struct ScopedXarFile {
-  xar_t xar;
-  ScopedXarFile(const char *filename, int32_t flags)
-      : xar(xar_open(filename, flags)) {}
-  ~ScopedXarFile() {
-    if (xar)
-      xar_close(xar);
-  }
-  ScopedXarFile(const ScopedXarFile &) = delete;
-  ScopedXarFile &operator=(const ScopedXarFile &) = delete;
-  operator xar_t() { return xar; }
-};
-
-struct ScopedXarIter {
-  xar_iter_t iter;
-  ScopedXarIter() : iter(xar_iter_new()) {}
-  ~ScopedXarIter() {
-    if (iter)
-      xar_iter_free(iter);
-  }
-  ScopedXarIter(const ScopedXarIter &) = delete;
-  ScopedXarIter &operator=(const ScopedXarIter &) = delete;
-  operator xar_iter_t() { return iter; }
-};
-
-
 static cl::opt<string> InputFilename("i", cl::desc("<input file>"),
                                      cl::Required);
 
@@ -96,6 +63,7 @@ void HandleMachOObjFile(MachOObjectFile *MachO) {
   SMDiagnostic diag;
   LLVMContext ctx;
   Module module("Noctilucence",ctx);
+  stringstream ldargs;
   for (section_iterator iter = MachO->section_begin(), E = MachO->section_end();
        iter != E; ++iter) {
     SectionRef section = *iter;
@@ -124,7 +92,6 @@ void HandleMachOObjFile(MachOObjectFile *MachO) {
           assert(buffer!=nullptr && "xar extraction failed");
           char* sizeStr=xar_get_size(xar,xf);
           long int total=atol(sizeStr);
-          errs()<<sizeStr<<"\n";
           free(sizeStr);
 
           MemoryBuffer* MB=MemoryBuffer::getMemBuffer(StringRef(buffer,total),"",false).get();
@@ -135,8 +102,21 @@ void HandleMachOObjFile(MachOObjectFile *MachO) {
           free(buffer);
         }
 
+        for(xar_subdoc_t doc=xar_subdoc_first(xar);doc;doc = xar_subdoc_next(doc)){
+          if(strcmp("Ld",xar_subdoc_name(doc))==0){
+            /*char* val=nullptr;
+            xar_subdoc_prop_get(doc,const_cast<const char*>("architecture"),const_cast<const char**>(&val));
+            ldargs<<"-arch "<<val<<" ";*/
+            
+          }
+        }
+
         xar_close(xar);
         Error err=tf.discard();
+        if(err){
+          errs()<<err<<"\n";
+          abort();
+        }
       }
       else{
         errs()<<"Creating xar temporary file failed:"<<tfOrError.takeError()<<"\n";
@@ -152,6 +132,8 @@ void HandleMachOObjFile(MachOObjectFile *MachO) {
   ModulePass* obfPass=createObfuscationPass();
   obfPass->runOnModule(module);
   delete obfPass;
+
+
 }
 /*
   ELFs:
