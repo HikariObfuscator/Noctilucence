@@ -1,4 +1,4 @@
-;===- ./tools/refrain/LLVMBuild.txt ---------------------------*- Conf -*--===;
+;===- ./tools/Noctilucence/LLVMBuild.txt ---------------------------*- Conf -*--===;
 ;
 ;                     The LLVM Compiler Infrastructure
 ;
@@ -17,6 +17,6 @@
 
 [component_0]
 type = Tool
-name = refrain
+name = Noctilucence
 parent = Tools
-required_libraries = Analysis BitReader BinaryFormat Support Passes AggressiveInstCombine Coroutines IPO InstCombine Instrumentation Scalar Utils Vectorize ObjCARC Obfuscation
+required_libraries = Analysis BitReader BinaryFormat Support Passes AggressiveInstCombine Coroutines IPO InstCombine Instrumentation Scalar Utils Vectorize ObjCARC Obfuscation all-targets
