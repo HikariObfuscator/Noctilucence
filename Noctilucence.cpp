@@ -1,6 +1,11 @@
 /*
  *  LLVM Bitcode Recompiler
     Copyright (C) 2017 Zhang(https://github.com/Naville/)
+    Exceptions:
+        Anyone who has associated with ByteDance in anyway at any past, current,
+        or future time point is prohibited from direct using this piece of software
+        or create any derivative from it.
+
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published
