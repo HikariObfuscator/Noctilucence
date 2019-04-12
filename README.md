@@ -21,12 +21,12 @@ Noctilucence directly uses LLVM's CodeGen without invoking a ton of processes an
 
 - Automatically extract binary from IPAs/APKs
 - Extracting object files from static libraries. Note this is hard to implement due to LLVM's broken ``llvm::object::Archive`` on Darwin.
+- For whatever reason the embedded BitCode has been stripped, which removes many symbols and metadatas that the open-source version of Hikari depends on, essentially disabling non-CFG obfuscation passes like ``AntiClassDump`` and ``FunctionCallObfuscate``, which means you probably shouldn't enable those passes. Maybe instead figure out how to tell Xcode/Clang not to strip them? Meh I couldn't care less
 
 # Compiling
-``git clone https://github.com/Naville/Noctilucence.git LLVM_SOURCE_ROOT/tools/`` and compile the whole LLVM suite with it
+``git clone https://github.com/HikariObfuscator/Noctilucence.git LLVM_SOURCE_ROOT/tools/`` and compile the whole LLVM suite with it
 
 # Demonstration
-**Note that the open-source version of Hikari is not fully designed for this kind of use-case so you should only enable CFG related obfuscations, which means no AntiClassDump/StringEncryption/FCO**
 ![Run](https://github.com/Naville/Noctilucence/blob/master/Images/Execution.png?raw=true)  
 ![Result](https://github.com/Naville/Noctilucence/blob/master/Images/After.png?raw=true)  
 # License

@@ -233,7 +233,7 @@ string HandleMachOObjFile(MachOObjectFile *MachO, const char **argv) {
     const Target *target = TargetRegistry::lookupTarget(tri.getTriple(), err);
     if (target == nullptr) {
       errs() << err << "\n";
-      abort();
+      exit(-1);
     }
     TargetOptions Options = InitTargetOptionsFromCodeGenFlags();
     Options.DisableIntegratedAS = false;
