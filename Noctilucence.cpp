@@ -238,6 +238,11 @@ string HandleMachOObjFile(MachOObjectFile *MachO, const char **argv) {
     errs() << "Bitcode not Found!\n";
     abort();
   }
+  errs()<<"Extracted Linker Flags:\n";
+  for(decltype(ldargs.size()) i=1;i<ldargs.size()-1;i++){
+    errs()<<ldargs[i]<<" ";
+  }
+  errs()<<"\n";
   // TargetOptions's setup is by no mean complete, though
   SmallString<128> TmpModel;
   path::system_temp_directory(true, TmpModel);
@@ -245,7 +250,7 @@ string HandleMachOObjFile(MachOObjectFile *MachO, const char **argv) {
   Expected<TempFile> tfOrError = TempFile::create(TmpModel);
   if (tfOrError) {
     TempFile &tf = tfOrError.get();
-    errs() << "Created temporary object file at:" << tf.TmpName
+    errs() << "Created temporary object file placeholder at:" << tf.TmpName
            << " with FD:" << tf.FD << "\n";
     raw_fd_ostream rf(tf.FD, false);
     Triple tri(module.getTargetTriple());
