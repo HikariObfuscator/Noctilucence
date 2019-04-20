@@ -3,6 +3,9 @@ LLVM-Based tool that statically extract the Bitcode section from an object file,
 Note that currently only support for MachOs built by Apple Clang is implemented
 
 # License
+Please refer to [License](https://github.com/HikariObfuscator/Hikari/wiki/License). 
+
+Note that this linked version of license text overrides any artifact left in source code
 
 # Why
 Existing implementations suck because they do all the following which is plain retarded design in my opinion:
