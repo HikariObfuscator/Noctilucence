@@ -26,8 +26,10 @@
 #include "llvm/CodeGen/TargetPassConfig.h"
 #include "llvm/IR/DataLayout.h"
 #include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/Verifier.h"
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/IR/Module.h"
+#include "llvm/IR/IRPrintingPasses.h"
 #include "llvm/IRReader/IRReader.h"
 #include "llvm/Linker/Linker.h"
 #include "llvm/Object/Archive.h"
@@ -46,6 +48,7 @@
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Support/TargetRegistry.h"
 #include "llvm/Support/TargetSelect.h"
+#include "llvm/Support/raw_os_ostream.h"
 #include "llvm/Target/TargetOptions.h"
 #include "llvm/Transforms/IPO/PassManagerBuilder.h"
 #include <algorithm>
@@ -53,6 +56,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <fstream>
 #include <xar/xar.h>
 
 using namespace llvm;
@@ -60,6 +64,9 @@ using namespace llvm::sys;
 using namespace llvm::sys::fs;
 using namespace llvm::object;
 using namespace std;
+static cl::opt<bool> DumpIR("dump-ir", cl::init(false),
+                                         cl::NotHidden,
+                                         cl::desc("Dump Obfuscated IR."));
 static cl::opt<string> OutputFilename("o", cl::desc("<output file>"),
                                       cl::Required);
 static cl::opt<string> InputFilename("i", cl::desc("<input file>"),
@@ -72,6 +79,30 @@ static cl::opt<string>
                 cl::init("/Applications/Xcode.app/Contents/Developer/Platforms/"
                          "iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk"),
                 cl::desc("SDKROOT"));
+
+                #define VM(Name) errs() << "Verifying "<< Name << "...\n"; \
+                  bool dbgInfo; \
+                  if(verifyModule(module, &errs(), &dbgInfo)){ \
+                    SmallString<128> TmpModel; \
+                    path::system_temp_directory(true, TmpModel); \
+                    path::append(TmpModel, "HikariCrashTemporaryIR%%%%%.ll"); \
+                    int fd=-1; \
+                    SmallString<128> ResultPath; \
+                    std::error_code EC=fs::createUniqueFile(TmpModel,fd,ResultPath); \
+                    if(!EC && fd!=-1){ \
+                      raw_fd_ostream OS(fd,true); \
+                      ModulePass* PMP=createPrintModulePass(OS); \
+                      PMP->runOnModule(module); \
+                      delete PMP; \
+                      OS.flush(); \
+                      errs()<<"Written Crashed LLVM IR to:"<<ResultPath.str()<<"\n"; \
+                    } \
+                    else{ \
+                      errs()<<"Creating Temporary File Failed, ErroCode:"<<EC.message()<<"\n"; \
+                    } \
+                    abort(); \
+                  } \
+
 string HandleMachOObjFile(MachOObjectFile *MachO, const char **argv) {
   if (MachO == nullptr) {
     report_fatal_error(make_error<GenericBinaryError>("MachO is NULL!"), false);
@@ -228,6 +259,12 @@ string HandleMachOObjFile(MachOObjectFile *MachO, const char **argv) {
       FPM.run(F);
     }
     MPM.run(module);
+    VM("Noctilucence")
+    if(DumpIR){
+        std::ofstream std_file_stream(OutputFilename+".ll");
+	      raw_os_ostream file_stream(std_file_stream);
+	      module.print(file_stream, nullptr);
+    }
     std::string err;
     string arch = "";
     const Target *target = TargetRegistry::lookupTarget(tri.getTriple(), err);

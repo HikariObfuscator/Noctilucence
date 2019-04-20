@@ -11,6 +11,7 @@ Existing implementations suck because they do all the following which is plain r
 The following arguments are required:
 - ``-i=`` Path to input executable
 - ``-o=`` Path to output executable
+- ``-dump-ir`` Dump Obfuscated IR in text representation to ``Path to output executable.ll`` for other more advanced usage
 
 The following arguments are automatically detected
 - ``-sdkroot=`` Path to SDKROOT, default to ``/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk``
