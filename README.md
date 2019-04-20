@@ -2,6 +2,8 @@
 LLVM-Based tool that statically extract the Bitcode section from an object file, run passes on it and recompile/link it again.  
 Note that currently only support for MachOs built by Apple Clang is implemented
 
+# License
+
 # Why
 Existing implementations suck because they do all the following which is plain retarded design in my opinion:
 - Invoke a ton of processes through ``posix_spawn``, Noctilucence only invokes system's linker due to the lack of MachO support in LLD
