@@ -35,5 +35,3 @@ Noctilucence directly uses LLVM's CodeGen without invoking a ton of processes an
 # Demonstration
 ![Run](https://github.com/Naville/Noctilucence/blob/master/Images/Execution.png?raw=true)  
 ![Result](https://github.com/Naville/Noctilucence/blob/master/Images/After.png?raw=true)  
-# License
-As always, this work is licensed under ``AGPLV3, ByteDance employees prohibited`` license, please refer to ``LICENSE`` for the full license text
