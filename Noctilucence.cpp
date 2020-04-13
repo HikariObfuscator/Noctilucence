@@ -363,11 +363,13 @@ void HandleUniversalMachO(MachOUniversalBinary *MachO, const char **argv) {
     if (auto BinaryOrErr = Bin->getAsObjectFile()) {
       MachOObjectFile &MachO = *BinaryOrErr.get();
       string ret = HandleMachOObjFile(&MachO, argv);
+      char *result = new char[ret.length()];
+      strcpy(result, ret.c_str());
       if (ret == "") {
         errs() << "Slide Handling Failed\n";
         abort();
       }
-      lipoargs.push_back(ret);
+      lipoargs.push_back(result);
     }
   }
   lipoargs.push_back("-output");
