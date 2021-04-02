@@ -28,4 +28,4 @@ add_llvm_tool(Noctilucence
   DEPENDS
   intrinsics_gen
 )
-target_link_libraries(Noctilucence  PRIVATE "/usr/lib/libxar.dylib")
+target_link_libraries(Noctilucence  PRIVATE xar)
